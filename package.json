@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf dist && ./node_modules/.bin/tsc",
     "start:local": "export $(cat local.env | grep -Ev '^\\s*$|^\\s*\\#' | xargs) && npm run build && node dist/server.js",
-    "start:dev": "export $(cat local.env | grep -Ev '^\\s*$|^\\s*\\#' | xargs) && npm run build && sls offline"
+    "start:dev": "export $(cat local.env | grep -Ev '^\\s*$|^\\s*\\#' | xargs) && npm run build && sls offline",
+    "deploy": "export $(cat .env | grep -Ev '^\\s*$|^\\s*\\#' | xargs) && npm run build && serverless deploy"
   },
   "repository": {
     "type": "git",
