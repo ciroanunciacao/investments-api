@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as url from 'url';
 import {
-  APIGatewayProxyEvent, APIGatewayProxyResult, Context, Callback,
+  APIGatewayProxyEvent, APIGatewayProxyResult, Context,
 } from 'aws-lambda';
 
 import { handler } from './api';
@@ -105,11 +105,8 @@ const handleServer: http.RequestListener = (
         },
       };
 
-      const callback: Callback<APIGatewayProxyResult> = (
-        error?: Error | string | null,
-        result?: APIGatewayProxyResult,
-      ) => {
-        if (result) {
+      (handler(event, context, null) as Promise<APIGatewayProxyResult>)
+        .then((result: APIGatewayProxyResult) => {
           const responseHeaders = result.headers || {};
           Object.keys(responseHeaders).forEach((header) => {
             res.setHeader(header, responseHeaders[header].toString());
@@ -117,14 +114,12 @@ const handleServer: http.RequestListener = (
           res.writeHead(result.statusCode);
           res.write(result.body);
           res.end();
-        } else {
+        })
+        .catch((error: any) => {
           res.writeHead(500);
           res.write(JSON.stringify(error));
           res.end();
-        }
-      };
-
-      handler(event, context, callback);
+        });
     },
   };
 
