@@ -28,9 +28,9 @@ export const createHandler = async (): Promise<any> => {
   }).createHandler();
 };
 
-export const handler: APIGatewayProxyHandler = async (
+export const handler: APIGatewayProxyHandler = (
   event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>,
-): Promise<any> => {
+) => {
   const handlerCallback: Callback<APIGatewayProxyResult> = (
     error?: Error | string | null,
     result?: APIGatewayProxyResult,
@@ -38,6 +38,7 @@ export const handler: APIGatewayProxyHandler = async (
     if (error) {
       Logger.e(consts.APP.TAG, 'Error on handler callback', error);
     }
+    Logger.d(consts.APP.TAG, 'callback result', result);
     callback(error, result);
   };
 
@@ -47,23 +48,24 @@ export const handler: APIGatewayProxyHandler = async (
   } else {
     Logger.i(consts.APP.TAG, 'Creating database connection');
 
-    try {
-      handlerGraph = await createHandler();
-      await initialize();
-      Logger.i(consts.APP.TAG, 'Database connected');
-      handlerGraph(event, context, handlerCallback);
-    } catch (error) {
-      Logger.e(consts.APP.TAG, 'Error creating database connection', error);
-      handlerGraph = undefined;
-      const result: APIGatewayProxyResult = {
-        statusCode: 500,
-        body: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-        isBase64Encoded: false,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-      handlerCallback(null, result);
-    }
+    createHandler()
+      .then(async (fn: any) => {
+        handlerGraph = fn;
+        await initialize();
+        Logger.i(consts.APP.TAG, 'Database connected');
+        handlerGraph(event, context, handlerCallback);
+      }).catch((error) => {
+        Logger.e(consts.APP.TAG, 'Error creating database connection', error);
+        handlerGraph = undefined;
+        const result: APIGatewayProxyResult = {
+          statusCode: 500,
+          body: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+          isBase64Encoded: false,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        handlerCallback(null, result);
+      });
   }
 };
