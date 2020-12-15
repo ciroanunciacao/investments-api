@@ -1,0 +1,24 @@
+service: investments-api
+plugins:
+  - serverless-offline
+provider:
+  name: aws
+  runtime: nodejs12.x
+functions:
+  graphql:
+    handler: dist/api.handler
+    events:
+    - http:
+        path: graphql
+        method: post
+        cors: true
+    - http:
+        path: graphql
+        method: get
+        cors: true
+    environment:
+      MONGODB_URI: ${env:MONGODB_URI}
+      AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
+      AUTH0_CLIENT_ID: ${env:AUTH0_CLIENT_ID}
+      AUTH0_CLIENT_SECRET: ${env:AUTH0_CLIENT_SECRET}
+      LOG_LEVEL: debug
