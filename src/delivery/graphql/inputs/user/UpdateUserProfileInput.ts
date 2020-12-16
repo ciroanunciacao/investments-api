@@ -3,6 +3,9 @@ import { User } from '../../../../domain/entities/User';
 
 @InputType()
 export default class UpdateUserProfileInput implements Partial<User> {
-  @Field({ nullable: true })
+  @Field()
+  name?: string;
+
+  @Field()
   birthdate?: Date;
 }
