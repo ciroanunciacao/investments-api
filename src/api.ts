@@ -25,7 +25,12 @@ export const createHandler = async (): Promise<any> => {
     playground: {
       endpoint: '/dev/graphql',
     },
-  }).createHandler();
+  }).createHandler({
+    cors: {
+      origin: '*',
+      credentials: true,
+    },
+  });
 };
 
 const callHandlerGraph = async (event: APIGatewayProxyEvent, context: Context):
